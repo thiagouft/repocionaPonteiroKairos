@@ -45,10 +45,10 @@ const runAutomation = async () => {
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
         console.log('✅ Login realizado com sucesso.');
 
-        // Loop pelos relógios
+        // 1. Iterar por todos os relógios para fazer a reposição do ponteiro
         for (let i = 1; i <= 28; i++) {
             const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
-            console.log(`\n🔄 Processando relógio ${i}...`);
+            console.log(`\n🔄 Processando reposição do ponteiro para o relógio ${i}...`);
 
             try {
                 await page.goto(ADVANCED_PAGE_URL, { waitUntil: 'networkidle2' });
@@ -83,44 +83,170 @@ const runAutomation = async () => {
                 await page.click('#bReposicaoPonteiro');
                 console.log('✔️ Confirmação da reposição executada.');
 
-                // Comandos do relógio
+            } catch (innerErr) {
+                console.error(`❌ Erro na reposição do ponteiro para o relógio ${i}: ${innerErr.message}`);
+                continue;
+            }
+        }
+
+        // 2. Iterar por todos os relógios para fazer a 1ª importação (Status Completo e Status Imediato)
+        for (let i = 1; i <= 28; i++) {
+            const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
+            console.log(`\n🔄 Processando 1ª importação para o relógio ${i}...`);
+
+            try {
+                await page.goto(ADVANCED_PAGE_URL, { waitUntil: 'networkidle2' });
+                await sleep(500); // 🕒 delay
+
                 await page.waitForSelector('#TabExportarDados', { visible: true, timeout: 5000 });
 
                 await page.evaluate(() => {
                     const exportTab = document.querySelector('#TabExportarDados');
                     if (exportTab) exportTab.scrollIntoView({ behavior: "smooth", block: "center" });
                 });
+                await sleep(500);
 
-                await sleep(500); // 🕒 delay para scroll
                 await page.waitForFunction(() => {
                     const el = document.querySelector('#TabExportarDados');
                     return el && el.offsetParent !== null;
                 }, { timeout: 3000 });
 
                 await page.click('#TabExportarDados');
-                await sleep(500); // 🕒 delay
+                await sleep(500);
                 console.log('📁 Aba "Comandos do Relógio" aberta.');
 
-                // Importar
+                // Seleciona "Importar"
                 await page.waitForSelector('label[for="radioFunctionImportar"]');
                 await page.click('label[for="radioFunctionImportar"]');
-                await sleep(300); // 🕒 delay
-                console.log('☑️ Opção "Importar" selecionada.');
+                await sleep(300);
+                console.log('☑️ Opção "Importar" selecionada para "Status Completo" e "Status Imediato".');
 
-                // Marcar Marcações
-                await page.waitForSelector('label[for="checkImportarMarcacoes"]');
-                await page.click('label[for="checkImportarMarcacoes"]');
-                await sleep(300); // 🕒 delay
-                console.log('🔘 "Marcações" marcado.');
+                // Marca "Status Completo"
+                await page.waitForSelector('label[for="checkboxImportarStatusCompleto"]');
+                await page.click('label[for="checkboxImportarStatusCompleto"]');
+                await sleep(300);
+                console.log('🔘 "Status Completo" marcado.');
 
-                // Importar
+                // Marca "Status Imediato"
+                await page.waitForSelector('label[for="checkboxImportarStatusImediato"]');
+                await page.click('label[for="checkboxImportarStatusImediato"]');
+                await sleep(300);
+                console.log('🔘 "Status Imediato" marcado.');
+
+                // Clica em "Importar"
                 await page.waitForSelector('.buttonImportar');
                 await page.click('.buttonImportar');
-                await sleep(1000); // 🕒 delay
-                console.log('📨 Importação concluída com sucesso.');
+                await sleep(1000);
+                console.log('📨 Importação de "Status Completo" e "Status Imediato" concluída.');
 
             } catch (innerErr) {
-                console.error(`❌ Erro no relógio ${i}: ${innerErr.message}`);
+                console.error(`❌ Erro na 1ª importação para o relógio ${i}: ${innerErr.message}`);
+                continue;
+            }
+        }
+
+        // 3. Iterar por todos os relógios para fazer a 2ª importação (Marcações)
+        for (let i = 1; i <= 28; i++) {
+            const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
+            console.log(`\n🔄 Processando 2ª importação para o relógio ${i}...`);
+
+            try {
+                await page.goto(ADVANCED_PAGE_URL, { waitUntil: 'networkidle2' });
+                await sleep(500); // 🕒 delay
+
+                await page.waitForSelector('#TabExportarDados', { visible: true, timeout: 5000 });
+
+                await page.evaluate(() => {
+                    const exportTab = document.querySelector('#TabExportarDados');
+                    if (exportTab) exportTab.scrollIntoView({ behavior: "smooth", block: "center" });
+                });
+                await sleep(500);
+
+                await page.waitForFunction(() => {
+                    const el = document.querySelector('#TabExportarDados');
+                    return el && el.offsetParent !== null;
+                }, { timeout: 3000 });
+
+                await page.click('#TabExportarDados');
+                await sleep(500);
+                console.log('📁 Aba "Comandos do Relógio" aberta.');
+
+                // Seleciona "Importar"
+                await page.waitForSelector('label[for="radioFunctionImportar"]');
+                await page.click('label[for="radioFunctionImportar"]');
+                await sleep(300);
+                console.log('☑️ Opção "Importar" selecionada novamente para "Marcações".');
+
+                // Marca "Marcações"
+                await page.waitForSelector('label[for="checkImportarMarcacoes"]');
+                await page.click('label[for="checkImportarMarcacoes"]');
+                await sleep(300);
+                console.log('🔘 "Marcações" marcado.');
+
+                // Clica em "Importar"
+                await page.waitForSelector('.buttonImportar');
+                await page.click('.buttonImportar');
+                await sleep(1000);
+                console.log('📨 Importação de "Marcações" concluída.');
+
+            } catch (innerErr) {
+                console.error(`❌ Erro na 2ª importação para o relógio ${i}: ${innerErr.message}`);
+                continue;
+            }
+        }
+
+        // 4. Iterar por todos os relógios para fazer a 3ª importação (Status Completo e Status Imediato novamente)
+        for (let i = 1; i <= 28; i++) {
+            const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
+            console.log(`\n🔄 Processando 3ª importação para o relógio ${i}...`);
+
+            try {
+                await page.goto(ADVANCED_PAGE_URL, { waitUntil: 'networkidle2' });
+                await sleep(500); // 🕒 delay
+
+                await page.waitForSelector('#TabExportarDados', { visible: true, timeout: 5000 });
+
+                await page.evaluate(() => {
+                    const exportTab = document.querySelector('#TabExportarDados');
+                    if (exportTab) exportTab.scrollIntoView({ behavior: "smooth", block: "center" });
+                });
+                await sleep(500);
+
+                await page.waitForFunction(() => {
+                    const el = document.querySelector('#TabExportarDados');
+                    return el && el.offsetParent !== null;
+                }, { timeout: 3000 });
+
+                await page.click('#TabExportarDados');
+                await sleep(500);
+                console.log('📁 Aba "Comandos do Relógio" aberta.');
+
+                // Seleciona "Importar"
+                await page.waitForSelector('label[for="radioFunctionImportar"]');
+                await page.click('label[for="radioFunctionImportar"]');
+                await sleep(300);
+                console.log('☑️ Opção "Importar" selecionada novamente para "Status Completo" e "Status Imediato".');
+
+                // Marca "Status Completo"
+                await page.waitForSelector('label[for="checkboxImportarStatusCompleto"]');
+                await page.click('label[for="checkboxImportarStatusCompleto"]');
+                await sleep(300);
+                console.log('🔘 "Status Completo" marcado.');
+
+                // Marca "Status Imediato"
+                await page.waitForSelector('label[for="checkboxImportarStatusImediato"]');
+                await page.click('label[for="checkboxImportarStatusImediato"]');
+                await sleep(300);
+                console.log('🔘 "Status Imediato" marcado.');
+
+                // Clica em "Importar"
+                await page.waitForSelector('.buttonImportar');
+                await page.click('.buttonImportar');
+                await sleep(1000);
+                console.log('📨 Importação de "Status Completo" e "Status Imediato" concluída novamente.');
+
+            } catch (innerErr) {
+                console.error(`❌ Erro na 3ª importação para o relógio ${i}: ${innerErr.message}`);
                 continue;
             }
         }
