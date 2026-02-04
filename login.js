@@ -46,7 +46,7 @@ const runAutomation = async () => {
         console.log('✅ Login realizado com sucesso.');
 
         // 1. Iterar por todos os relógios para fazer a reposição do ponteiro
-        for (let i = 1; i <= 28; i++) {
+        for (let i = 1; i <= 32; i++) {
             const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
             console.log(`\n🔄 Processando reposição do ponteiro para o relógio ${i}...`);
 
@@ -90,7 +90,7 @@ const runAutomation = async () => {
         }
 
         // 2. Iterar por todos os relógios para fazer a 1ª importação (Status Completo e Status Imediato)
-        for (let i = 1; i <= 28; i++) {
+        for (let i = 1; i <= 32; i++) {
             const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
             console.log(`\n🔄 Processando 1ª importação para o relógio ${i}...`);
 
@@ -146,7 +146,7 @@ const runAutomation = async () => {
         }
 
         // 3. Iterar por todos os relógios para fazer a 2ª importação (Marcações)
-        for (let i = 1; i <= 28; i++) {
+        for (let i = 1; i <= 32; i++) {
             const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
             console.log(`\n🔄 Processando 2ª importação para o relógio ${i}...`);
 
@@ -196,7 +196,7 @@ const runAutomation = async () => {
         }
 
         // 4. Iterar por todos os relógios para fazer a 3ª importação (Status Completo e Status Imediato novamente)
-        for (let i = 1; i <= 28; i++) {
+        for (let i = 1; i <= 32; i++) {
             const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
             console.log(`\n🔄 Processando 3ª importação para o relógio ${i}...`);
 
