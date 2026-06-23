@@ -48,6 +48,24 @@ const runAutomation = async () => {
         await page.waitForNavigation({ waitUntil: 'networkidle2' });
         console.log('✅ Login realizado com sucesso.');
 
+        // Nova opção para atualizar data e hora de todos os relógios
+        if (process.argv[2] && process.argv[2].toLowerCase() === 'datahora') {
+            console.log('📅 Iniciando atualização de data e hora para todos os relógios...');
+            for (const i of RELOGIOS) {
+                const targetUrl = `https://www.dimepkairos.com.br/Dimep/Relogios/AgendarOperacaoRelogio/${i}?operacao=3`;
+                console.log(`\n🔄 Enviando comando de data e hora para o relógio ${i}...`);
+                try {
+                    await page.goto(targetUrl, { waitUntil: 'networkidle2' });
+                    await page.waitForSelector('.validation-summary-ok', { timeout: 10000 });
+                    console.log(`✅ Comando enviado com sucesso para o relógio ${i}.`);
+                    await sleep(500); // 🕒 delay
+                } catch (innerErr) {
+                    console.error(`❌ Erro ao enviar comando para o relógio ${i}: ${innerErr.message}`);
+                }
+            }
+            return;
+        }
+
         // 1. Iterar por todos os relógios para fazer a reposição do ponteiro
         for (const i of RELOGIOS) {
             const ADVANCED_PAGE_URL = `${ADVANCED_PAGE_BASE_URL}${i}`;
